@@ -3,7 +3,6 @@ module github.com/ashikhman/samogonick
 go 1.12
 
 require (
-	golang.org/x/text v0.3.0 // indirect
-	rsc.io/quote v1.5.2
-	rsc.io/sampler v1.99.99 // indirect
+	github.com/pkg/errors v0.8.1
+	gopkg.in/yaml.v2 v2.2.2
 )
