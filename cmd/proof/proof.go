@@ -2,13 +2,16 @@ package main
 
 import (
 	"bytes"
-	"database/sql"
 	"fmt"
 	"github.com/cucumber/gherkin-go"
 	"github.com/pkg/errors"
+	"github.com/proofhouse/proofhouse/pkg/plugin"
+	_ "github.com/proofhouse/proofhouse/pkg/plugin/http"
+	"github.com/proofhouse/proofhouse/pkg/proofhouse"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 type Feature struct {
@@ -31,14 +34,10 @@ func main() {
 		}
 	}()
 
-	sql.Register()
-
-	config, err := NewConfig("./configuration.yaml")
+	config, err := proofhouse.NewConfig("./configuration.yaml")
 	if err != nil {
 		panic(err)
 	}
-
-	fmt.Println(config.Plugins)
 
 	var features []Feature
 
@@ -58,6 +57,8 @@ func main() {
 		panic(err)
 	}
 
+	registry := plugin.GetRegistry()
+
 	for _, f := range features {
 		data, err := ioutil.ReadFile(f.path)
 		if err != nil {
@@ -69,6 +70,33 @@ func main() {
 			panic(errors.Wrap(err, "Failed to parse feature"))
 		}
 
-		_ = doc
+		for _, s := range doc.Feature.Children {
+			switch s := s.(type) {
+			default:
+				panic(errors.Errorf("Unexpected type '%T'", s))
+			case *gherkin.Scenario:
+				runScenario(s, registry)
+			case *gherkin.ScenarioOutline:
+				fmt.Println("OUTLINE!!!")
+			}
+		}
 	}
+
+}
+
+func runScenario(scenario *gherkin.Scenario, registry *plugin.Registry) {
+	for _, step := range scenario.Steps {
+		fmt.Println("Original text: ", step.Text)
+		fmt.Println("Unified text: ", unifyStepText(step.Text))
+	}
+}
+
+func unifyStepText(text string) string {
+	var str strings.Builder
+
+	for _, r := range text {
+		str.WriteRune(r)
+	}
+
+	return str.String()
 }

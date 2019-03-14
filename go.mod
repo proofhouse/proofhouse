@@ -1,4 +1,4 @@
-module github.com/ashikhman/samogonick
+module github.com/proofhouse/proofhouse
 
 go 1.12
 
