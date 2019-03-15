@@ -2,18 +2,30 @@ package plugin
 
 import "github.com/pkg/errors"
 
-type stepFunc func(p Params)
+type Handle func(p Params)
+
+type Step struct {
+	text     string
+	key      string
+	argNames []string
+	handle   Handle
+}
+
+func (s *Step) Text() string       { return s.text }
+func (s *Step) Key() string        { return s.key }
+func (s *Step) ArgNames() []string { return s.argNames }
+func (s *Step) Handle() Handle     { return s.handle }
 
 type Plugin struct {
 	name  string
-	steps map[string]stepFunc
+	steps map[string]Handle
 }
 
 // New creates plugin struct with given name.
 func New(name string) *Plugin {
 	return &Plugin{
 		name:  name,
-		steps: make(map[string]stepFunc),
+		steps: make(map[string]Handle),
 	}
 }
 
@@ -25,7 +37,7 @@ func New(name string) *Plugin {
 // f is a pointer to function which will be called by Proofhouse:
 //
 //     func (url string) {}
-func (p *Plugin) AddStep(text string, f stepFunc) {
+func (p *Plugin) AddStep(text string, f Handle) {
 	if f == nil {
 		panic(errors.Errorf("Failed to add step to plugin '%v': step's function cannot be nil", p.name))
 	}
@@ -42,6 +54,6 @@ func (p *Plugin) Name() string {
 }
 
 // Steps returns all registered plugin steps.
-func (p *Plugin) Steps() map[string]stepFunc {
+func (p *Plugin) Steps() map[string]Handle {
 	return p.steps
 }

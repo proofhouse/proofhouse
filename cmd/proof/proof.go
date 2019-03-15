@@ -12,6 +12,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 )
 
 type Feature struct {
@@ -86,17 +87,70 @@ func main() {
 
 func runScenario(scenario *gherkin.Scenario, registry *plugin.Registry) {
 	for _, step := range scenario.Steps {
-		fmt.Println("Original text: ", step.Text)
-		fmt.Println("Unified text: ", unifyStepText(step.Text))
+		var wg sync.WaitGroup
+
+		for i := 0; i < 10; i++ {
+			wg.Add(1)
+			go runStep(step, registry, &wg)
+		}
+
+		wg.Wait()
+
+		fmt.Println("DONE")
 	}
 }
 
-func unifyStepText(text string) string {
-	var str strings.Builder
+func runStep(gherkinStep *gherkin.Step, registry *plugin.Registry, wg *sync.WaitGroup) {
+	defer wg.Done()
 
+	parsedText := parseStepText(gherkinStep.Text)
+	step, err := registry.Step(parsedText.key)
+	if err != nil {
+		panic(err)
+	}
+
+	var data = map[string]string{}
+	for i, argName := range step.ArgNames() {
+		data[argName] = parsedText.args[i]
+	}
+
+	params := plugin.NewParams(data)
+
+	step.Handle()(params)
+}
+
+type ParsedStepText struct {
+	key  string
+	args []string
+}
+
+func parseStepText(text string) ParsedStepText {
+	var str strings.Builder
+	var argsBuf strings.Builder
+	var args []string
+
+	skip := false
 	for _, r := range text {
+		if skip {
+			if r == '"' {
+				str.WriteString("Ѻ")
+				skip = false
+				args = append(args, argsBuf.String())
+				argsBuf.Reset()
+			} else {
+				argsBuf.WriteRune(r)
+			}
+			continue
+		} else if r == '"' {
+			skip = true
+			continue
+		}
+
 		str.WriteRune(r)
 	}
 
-	return str.String()
+	return ParsedStepText{
+		key:  str.String(),
+		args: args,
+	}
 }

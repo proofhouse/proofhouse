@@ -9,6 +9,12 @@ type Params struct {
 	data map[string]string
 }
 
+func NewParams(data map[string]string) Params {
+	return Params{
+		data: data,
+	}
+}
+
 // Int returns value of parameter with the given name in 'int' type. It panics if no such parameter exists or if
 // conversion error occurs.
 func (p *Params) Int(name string) int {

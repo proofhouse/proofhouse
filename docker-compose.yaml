@@ -1,0 +1,13 @@
+version: '3.1'
+
+services:
+    postgres:
+        image: postgres:latest
+        environment:
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_USER: postgres
+            POSTGRES_DB: test
+        tmpfs:
+            - "/var/lib/postgresql/data"
+        ports:
+            - "13100:5432"
