@@ -71,6 +71,8 @@ func main() {
 			panic(errors.Wrap(err, "Failed to parse feature"))
 		}
 
+		fmt.Printf("%+v\n\n", doc.Feature.Name)
+
 		for _, s := range doc.Feature.Children {
 			switch s := s.(type) {
 			default:
@@ -89,7 +91,7 @@ func runScenario(scenario *gherkin.Scenario, registry *plugin.Registry) {
 	for _, step := range scenario.Steps {
 		var wg sync.WaitGroup
 
-		for i := 0; i < 10; i++ {
+		for i := 0; i < 1; i++ {
 			wg.Add(1)
 			go runStep(step, registry, &wg)
 		}
