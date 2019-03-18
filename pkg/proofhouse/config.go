@@ -10,8 +10,8 @@ import (
 
 // Config structure holds all configuration parameters.
 type Config struct {
-	FeaturesDir string   `yaml:"features_dir"`
-	Plugins     []string `yaml:"plugins"`
+	FeaturesDir string                 `yaml:"features_dir"`
+	Plugins     map[string]interface{} `yaml:"plugins"`
 }
 
 // NewConfig creates new Config struct with values parsed from "path" configuration file.

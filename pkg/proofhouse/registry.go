@@ -1,4 +1,4 @@
-package plugin
+package proofhouse
 
 import (
 	"github.com/pkg/errors"
@@ -9,18 +9,20 @@ import (
 // Plugin registry struct.
 type Registry struct {
 	sync.RWMutex
-	plugins map[string]*Plugin
-	steps   map[string]Step
+	plugins      map[string]*Plugin
+	initializers map[string]Initializer
+	steps        map[string]Step
 }
 
 var registry = Registry{
-	plugins: make(map[string]*Plugin),
-	steps:   make(map[string]Step),
+	plugins:      make(map[string]*Plugin),
+	initializers: make(map[string]Initializer),
+	steps:        make(map[string]Step),
 }
 
 // Register registers provided plugin in the registry under unique name.
-func Register(plg *Plugin) {
-	registry.add(plg.name, plg)
+func Register(name string, initializer Initializer) {
+	registry.add(name, initializer)
 }
 
 // GetRegistry returns registry struct filled with plugins.
@@ -44,29 +46,11 @@ func (r *Registry) Step(key string) (step Step, err error) {
 }
 
 // add provided plugin under given name.
-func (r *Registry) add(name string, plg *Plugin) {
+func (r *Registry) add(name string, initializer Initializer) {
 	r.Lock()
 	defer r.Unlock()
 
-	if plg == nil {
-		panic("Failed to register plugin: provided plugin object is nil")
-	}
-	if _, dup := r.plugins[name]; dup {
-		panic("Failed to register plugin: plugin with name " + name + " already exists")
-	}
-
-	r.plugins[name] = plg
-
-	for t, f := range plg.Steps() {
-		parsedText := parseStepText(t)
-
-		r.steps[parsedText.key] = Step{
-			text:     t,
-			key:      parsedText.key,
-			argNames: parsedText.args,
-			handle:   f,
-		}
-	}
+	r.initializers[name] = initializer
 }
 
 type ParsedStepText struct {
