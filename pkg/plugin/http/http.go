@@ -2,24 +2,21 @@ package http
 
 import (
 	"database/sql"
-	"fmt"
 	_ "github.com/lib/pq"
 	"github.com/proofhouse/proofhouse/pkg/proofhouse"
 )
 
 type Http struct {
-	proofhouse.PluginBase
 }
 
-func (p *Http) Test() {
-	fmt.Printf("AGAGAG TEST PLUGIN EEEE")
+type Handler struct {
 }
 
-func da(handle proofhouse.Handle) {
-	fmt.Printf("%T\n", handle)
+func (p *Http) GetHandler(num int) *Handler {
+	return &Handler{}
 }
 
-func Test() {
+func (h *Handler) Test(args proofhouse.Args, ctx proofhouse.Context) {
 
 }
 
@@ -35,20 +32,9 @@ func init() {
 		panic(err)
 	}
 
+	http := Http{}
+	handler := http.GetHandler(1)
+	_ = handler
 
-	var handle proofhouse.Handle = (*Http).Test
-	}
-
-	da(handle)
-
-
-	_ = db
-
-	proofhouse.Register("http", func(config *proofhouse.Config) (plugin proofhouse.Plugin, steps map[string]proofhouse.Handle) {
-		//steps = map[string]proofhouse.Handle {
-		//	"aga": (*Plugin).Test,
-		//}
-
-		return &Http{}, nil
-	})
+	proofhouse.Aga(Handler.Test)
 }

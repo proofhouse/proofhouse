@@ -6,6 +6,8 @@ import (
 	"sync"
 )
 
+type Initializer func()
+
 // Plugin registry struct.
 type Registry struct {
 	sync.RWMutex
@@ -20,7 +22,7 @@ var registry = Registry{
 	steps:        make(map[string]Step),
 }
 
-// Register registers provided plugin in the registry under unique name.
+// Register registers provided pluginpointers in the registry under unique name.
 func Register(name string, initializer Initializer) {
 	registry.add(name, initializer)
 }
@@ -45,7 +47,7 @@ func (r *Registry) Step(key string) (step Step, err error) {
 	return
 }
 
-// add provided plugin under given name.
+// add provided pluginpointers under given name.
 func (r *Registry) add(name string, initializer Initializer) {
 	r.Lock()
 	defer r.Unlock()

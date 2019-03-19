@@ -1,14 +1,18 @@
 package proofhouse
 
-type Initializer func(config *Config) (plugin Plugin, steps map[string]Handle)
-type Handle func(plugin *PluginBase)
+import "fmt"
 
 type Plugin interface {
-	BeforeScenario(ctx Context)
-	AfterScenario(ctx Context)
+	CreateHandler(int) *Handler
 }
 
-type PluginBase struct{}
+type Handler interface {
+	BeforeScenario()
+	AfterScenario()
+}
 
-func (p *PluginBase) BeforeScenario(ctx Context) {}
-func (p *PluginBase) AfterScenario(ctx Context)  {}
+type Handle func(p Plugin, args Args, ctx Context)
+
+func Aga(handle Handle) {
+	fmt.Printf("%+v\n", handle)
+}

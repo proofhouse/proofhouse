@@ -47,7 +47,7 @@ func main() {
 	//	panic(err)
 	//}
 	//
-	//registry := plugin.GetRegistry()
+	//registry := pluginpointers.GetRegistry()
 	//
 	//for _, f := range features {
 	//	data, err := ioutil.ReadFile(f.path)
@@ -77,7 +77,7 @@ func main() {
 }
 
 //
-//func runScenario(scenario *gherkin.Scenario, registry *plugin.Registry) {
+//func runScenario(scenario *gherkin.Scenario, registry *pluginpointers.Registry) {
 //	for _, step := range scenario.Steps {
 //		var wg sync.WaitGroup
 //
@@ -92,7 +92,7 @@ func main() {
 //	}
 //}
 //
-//func runStep(gherkinStep *gherkin.Step, registry *plugin.Registry, wg *sync.WaitGroup) {
+//func runStep(gherkinStep *gherkin.Step, registry *pluginpointers.Registry, wg *sync.WaitGroup) {
 //	defer wg.Done()
 //
 //	parsedText := parseStepText(gherkinStep.Text)
@@ -106,7 +106,7 @@ func main() {
 //		data[argName] = parsedText.args[i]
 //	}
 //
-//	params := plugin.NewParams(data)
+//	params := pluginpointers.NewParams(data)
 //
 //	step.Handle()(params)
 //}
