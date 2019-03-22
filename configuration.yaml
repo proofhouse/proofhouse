@@ -1,15 +1,5 @@
 features_dir: "./features"
-startup: "DATABASE_URL=%db_url% ./app serve"
 parallel: 4
-plugins:
-    postgres:
-        plugin: sql
-        type: postgres
-
 services:
     postgres:
-        docker: true
-        version: 8.5
-    redis:
-        docker: true
-        version:
+        version: 10

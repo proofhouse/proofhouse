@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	_ "github.com/proofhouse/proofhouse/pkg/plugin/http"
+	_ "github.com/proofhouse/proofhouse/pkg/plugin/sql"
 	"github.com/proofhouse/proofhouse/pkg/proofhouse"
 	"os"
 )

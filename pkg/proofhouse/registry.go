@@ -1,58 +1,21 @@
 package proofhouse
 
 import (
-	"github.com/pkg/errors"
+	"github.com/proofhouse/proofhouse/pkg/plugin"
 	"strings"
 	"sync"
 )
 
-type Initializer func()
+var (
+	pluginsMu sync.RWMutex
+	plugins   = make(map[string]plugin.Plugin)
+)
 
-// Plugin registry struct.
-type Registry struct {
-	sync.RWMutex
-	plugins      map[string]*Plugin
-	initializers map[string]Initializer
-	steps        map[string]Step
-}
+func Register(plugin plugin.Plugin) {
+	pluginsMu.Lock()
+	defer pluginsMu.Unlock()
 
-var registry = Registry{
-	plugins:      make(map[string]*Plugin),
-	initializers: make(map[string]Initializer),
-	steps:        make(map[string]Step),
-}
-
-// Register registers provided pluginpointers in the registry under unique name.
-func Register(name string, initializer Initializer) {
-	registry.add(name, initializer)
-}
-
-// GetRegistry returns registry struct filled with plugins.
-func GetRegistry() *Registry {
-	return &registry
-}
-
-// List returns plugins map.
-func (r *Registry) List() map[string]*Plugin {
-	return r.plugins
-}
-
-// Step looks for step definition for given step key.
-func (r *Registry) Step(key string) (step Step, err error) {
-	step, ok := r.steps[key]
-	if !ok {
-		err = errors.Errorf("No step found for key: %v", key)
-	}
-
-	return
-}
-
-// add provided pluginpointers under given name.
-func (r *Registry) add(name string, initializer Initializer) {
-	r.Lock()
-	defer r.Unlock()
-
-	r.initializers[name] = initializer
+	plugins[plugin.Name()] = plugin
 }
 
 type ParsedStepText struct {
