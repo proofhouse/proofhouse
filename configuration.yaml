@@ -1,5 +1,12 @@
 features_dir: "./features"
 parallel: 4
 services:
-    postgres:
-        version: 10
+    db:
+        type: postgres
+        version: 9.6
+        default: true
+    otherdb:
+        type: postgres
+        version: 12.0
+    redis:
+        version: 2.6

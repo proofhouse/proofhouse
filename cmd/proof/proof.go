@@ -4,6 +4,7 @@ import (
 	"fmt"
 	_ "github.com/proofhouse/proofhouse/pkg/plugin/sql"
 	"github.com/proofhouse/proofhouse/pkg/proofhouse"
+	_ "github.com/proofhouse/proofhouse/pkg/service/postgres"
 	"os"
 )
 
