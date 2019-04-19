@@ -1,10 +1,15 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
+	"github.com/proofhouse/proofhouse/pkg/container"
 	_ "github.com/proofhouse/proofhouse/pkg/plugin/sql"
 	"github.com/proofhouse/proofhouse/pkg/proofhouse"
+	"github.com/proofhouse/proofhouse/pkg/service"
 	_ "github.com/proofhouse/proofhouse/pkg/service/postgres"
+	"github.com/spf13/viper"
+	"log"
 	"os"
 )
 
@@ -21,13 +26,56 @@ func main() {
 		panic(err)
 	}
 
-	ch := make(chan proofhouse.Feature, 10)
+	_ = config
 
-	parser := proofhouse.NewParser(config)
-	go parser.Parse(ch)
 
-	runner := proofhouse.NewRunner(config)
-	runner.Run(ch)
+	cfg := viper.New()
+	cfg.SetDefault("aga", 123)
+
+	viper.SetConfigType("yaml") // or viper.SetConfigType("YAML")
+
+	// any approach to require this configuration into your program.
+	var yamlExample = []byte(`
+Hacker: true
+name: steve
+hobbies:
+- skateboarding
+- snowboarding
+- go
+clothing:
+  jacket: leather
+  trousers: denim
+  1231: 123
+age: 35
+eyes : brown
+beard: true
+`)
+
+	viper.ReadConfig(bytes.NewBuffer(yamlExample))
+
+	fmt.Printf("%v", viper.Get("clothing"))
+
+	postgresFactory := container.GetServiceFactory("postgres")
+	_ = postgresFactory
+
+	postgres := postgresFactory.Create()
+	_ = postgres
+
+	sql, ok := postgres.(service.SqlService)
+	if !ok {
+		log.Panicf("%T type is not subtype of service.SqlService", postgres)
+	}
+	_ = sql
+
+
+	//
+	//ch := make(chan proofhouse.Feature, 10)
+	//
+	//parser := proofhouse.NewParser(config)
+	//go parser.Parse(ch)
+	//
+	//runner := proofhouse.NewRunner(config)
+	//runner.Run(ch)
 
 	//
 	//var features []Feature
