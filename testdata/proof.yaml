@@ -1,0 +1,4 @@
+services:
+    db:
+        type: postgres
+        
